@@ -21,6 +21,7 @@ class WSU_Cereo_People {
 		add_action( 'init', array( $this, 'remove_people_editor_support' ), 12 );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'save_post' ), 10, 2 );
+		add_filter( 'gform_post_data', array( $this, 'capture_form_save' ), 10, 2 );
 	}
 
 	/**
@@ -52,19 +53,19 @@ class WSU_Cereo_People {
 	 * @todo - keywords
 	 */
 	public function display_people_fields_meta_box( $post ) {
-		$cereo_person_position = get_post_meta( $post->ID, '_cereo_person_position', true );
-		$cereo_person_department = get_post_meta( $post->ID, '_cereo_person_department', true );
-		$cereo_person_college = get_post_meta( $post->ID, '_cereo_person_college', true );
-		$cereo_person_campus = get_post_meta( $post->ID, '_cereo_person_campus', true );
-		$cereo_person_address = get_post_meta( $post->ID, '_cereo_person_address', true );
-		$cereo_person_phone = get_post_meta( $post->ID, '_cereo_person_phone', true );
-		$cereo_person_email = get_post_meta( $post->ID, '_cereo_person_email', true );
-		$cereo_person_web = get_post_meta( $post->ID, '_cereo_person_web', true );
-		$cereo_person_theme = get_post_meta( $post->ID, '_cereo_person_theme', true );
-		$cereo_person_specialty = get_post_meta( $post->ID, '_cereo_person_specialty', true );
-		$cereo_person_courses = get_post_meta( $post->ID, '_cereo_person_courses', true );
-		$cereo_person_research = get_post_meta( $post->ID, '_cereo_person_research', true );
-		$cereo_person_outreach = get_post_meta( $post->ID, '_cereo_person_outreach', true );
+		$cereo_person_position = get_post_meta( $post->ID, 'cereo_person_position', true );
+		$cereo_person_department = get_post_meta( $post->ID, 'cereo_person_department', true );
+		$cereo_person_college = get_post_meta( $post->ID, 'cereo_person_college', true );
+		$cereo_person_campus = get_post_meta( $post->ID, 'cereo_person_campus', true );
+		$cereo_person_address = get_post_meta( $post->ID, 'cereo_person_address', true );
+		$cereo_person_phone = get_post_meta( $post->ID, 'cereo_person_phone', true );
+		$cereo_person_email = get_post_meta( $post->ID, 'cereo_person_email', true );
+		$cereo_person_web = get_post_meta( $post->ID, 'cereo_person_web', true );
+		$cereo_person_theme = get_post_meta( $post->ID, 'cereo_person_theme', true );
+		$cereo_person_specialty = get_post_meta( $post->ID, 'cereo_person_specialty', true );
+		$cereo_person_courses = get_post_meta( $post->ID, 'cereo_person_courses', true );
+		$cereo_person_research = get_post_meta( $post->ID, 'cereo_person_research', true );
+		$cereo_person_outreach = get_post_meta( $post->ID, 'cereo_person_outreach', true );
 
 		wp_nonce_field( 'save-cereo-person', '_cereo_person_nonce' );
 		?>
@@ -163,7 +164,7 @@ class WSU_Cereo_People {
 
 		foreach( $fields as $field => $name ) {
 			if ( isset( $_POST[ $field ] ) ) {
-				update_post_meta( $post_id, '_' . $field, sanitize_text_field( $_POST[ $field ] ) );
+				update_post_meta( $post_id, $field, sanitize_text_field( $_POST[ $field ] ) );
 				$content_html .= '<tr><td>' . $name . '</td><td>' . sanitize_text_field( $_POST[ $field ] ) . '</td></tr>';
 			}
 		}
@@ -182,6 +183,23 @@ class WSU_Cereo_People {
 		remove_action( 'save_post', array( $this, 'save_post' ) );
 		$post->post_content = $content_html;
 		wp_update_post( $post );
+	}
+
+	/**
+	 * If saving the WSU Faculty Membership form, store a person record.
+	 *
+	 * @param $post_data
+	 * @param $form
+	 * @param $lead
+	 *
+	 * @return mixed
+	 */
+	public function capture_form_save( $post_data, $form ) {
+		if ( 'WSU Faculty Membership' === $form['title'] ) {
+			$post_data['post_type'] = $this->person_content_type;
+		}
+
+		return $post_data;
 	}
 }
 new WSU_Cereo_People();
