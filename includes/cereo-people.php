@@ -158,11 +158,21 @@ class WSU_Cereo_People {
 			'cereo_person_outreach',
 		);
 
+		$content_html = '<table><tr><td>Name:</td><td>' . esc_html( $post->post_title ) . '</td></tr>';
+
 		foreach( $fields as $field ) {
 			if ( isset( $_POST[ $field ] ) ) {
 				update_post_meta( $post_id, '_' . $field, sanitize_text_field( $_POST[ $field ] ) );
+				$content_html .= '<tr><td></td><td>' . sanitize_text_field( $_POST[ $field ] ) . '</td></tr>';
 			}
 		}
+
+		$content_html .= '</table>';
+
+		// Remove this action before saving the compile post content so that we aren't double processing the data.
+		remove_action( 'save_post', array( $this, 'save_post' ) );
+		$post->post_content = $content_html;
+		wp_update_post( $post );
 	}
 }
 new WSU_Cereo_People();
