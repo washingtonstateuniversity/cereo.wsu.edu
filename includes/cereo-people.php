@@ -20,6 +20,7 @@ class WSU_Cereo_People {
 		add_action( 'init', array( $this, 'register_uc_people_support' ), 9 );
 		add_action( 'init', array( $this, 'remove_people_editor_support' ), 12 );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
+		add_action( 'save_post', array( $this, 'save_post' ), 10, 2 );
 	}
 
 	/**
@@ -63,6 +64,8 @@ class WSU_Cereo_People {
 		$cereo_person_courses = get_post_meta( $post->ID, '_cereo_person_courses', true );
 		$cereo_person_research = get_post_meta( $post->ID, '_cereo_person_research', true );
 		$cereo_person_outreach = get_post_meta( $post->ID, '_cereo_person_outreach', true );
+
+		wp_nonce_field( 'save-cereo-person', '_cereo_person_nonce' );
 		?>
 		<style>
 			#wsu_cereo_people_fields label {
@@ -82,7 +85,7 @@ class WSU_Cereo_People {
 		<input class="regular-text" type="text" id="cereo-person-department" name="cereo_person_department" value="<?php echo esc_attr( $cereo_person_department ); ?>" />
 		<br />
 		<label for="cereo-person-college">College:</label>
-		<input class="regular-text" type="text" id="cereo-person-college" name="cereo_person_college" value-="<?php echo esc_attr( $cereo_person_college ); ?>" />
+		<input class="regular-text" type="text" id="cereo-person-college" name="cereo_person_college" value="<?php echo esc_attr( $cereo_person_college ); ?>" />
 		<br />
 		<label for="cereo-person-campus">WSU Campus:</label>
 		<input class="regular-text" type="text" id="cereo-person-campus" name="cereo_person_campus" value="<?php echo esc_attr( $cereo_person_campus ); ?>" />
@@ -114,6 +117,52 @@ class WSU_Cereo_People {
 		<label for="cereo-person-outreach">Outreach:</label>
 		<input class="large-text" type="text" id="cereo-person-outreach" name="cereo_person_outreach" value="<?php echo esc_attr( $cereo_person_outreach ); ?>" />
 		<?php
+	}
+
+	/**
+	 * Save meta data for a person when edited.
+	 *
+	 * @param int     $post_id ID of the post being saved.
+	 * @param WP_Post $post Object of the post being saved.
+	 */
+	public function save_post( $post_id, $post ) {
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		if ( $this->person_content_type !== $post->post_type ) {
+			return;
+		}
+
+		if ( 'auto-draft' === $post->post_status ) {
+			return;
+		}
+
+		if ( ! isset( $_POST['_cereo_person_nonce'] ) || false === wp_verify_nonce( $_POST['_cereo_person_nonce'], 'save-cereo-person' ) ) {
+			return;
+		}
+
+		$fields = array(
+			'cereo_person_position',
+			'cereo_person_department',
+			'cereo_person_college',
+			'cereo_person_campus',
+			'cereo_person_address',
+			'cereo_person_phone',
+			'cereo_person_email',
+			'cereo_person_web',
+			'cereo_person_theme',
+			'cereo_person_specialty',
+			'cereo_person_courses',
+			'cereo_person_research',
+			'cereo_person_outreach',
+		);
+
+		foreach( $fields as $field ) {
+			if ( isset( $_POST[ $field ] ) ) {
+				update_post_meta( $post_id, '_' . $field, sanitize_text_field( $_POST[ $field ] ) );
+			}
+		}
 	}
 }
 new WSU_Cereo_People();
