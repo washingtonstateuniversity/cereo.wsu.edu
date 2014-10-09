@@ -13,11 +13,14 @@ class WSU_Cereo_People {
 	 */
 	public $person_content_type = '';
 
+	public $person_type_taxonomy = 'cereo_person_type';
+
 	/**
 	 * Setup hooks.
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'register_uc_people_support' ), 9 );
+		add_action( 'init', array( $this, 'register_people_type_taxonomy' ), 10 );
 		add_action( 'init', array( $this, 'remove_people_editor_support' ), 12 );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'save_post' ), 10, 2 );
@@ -33,6 +36,32 @@ class WSU_Cereo_People {
 		add_theme_support( 'wsuwp_uc_person' );
 
 		$this->person_content_type = $wsuwp_university_center->people_content_type;
+	}
+
+	/**
+	 * Register a taxonomy to track types of people.
+	 */
+	public function register_people_type_taxonomy() {
+		$args = array(
+			'labels' => array(
+				'name' => 'People Types',
+				'singular_name' => 'People Type',
+				'search_items' => 'Search People Types',
+				'all_items' => 'All People Types',
+				'edit_item' => 'Edit People Type',
+				'update_item' => 'Update People Type',
+				'add_new_item' => 'Add New People Type',
+				'new_item_name' => 'New People Type Name',
+				'menu_name' => 'People Type',
+			),
+			'hierarchical' => false,
+			'show_ui' => true,
+			'show_admin_column' => true,
+			'query_var' => true,
+			'rewrite' => array( 'slug' => 'members' ),
+		);
+
+		register_taxonomy( $this->person_type_taxonomy, $this->person_content_type, $args );
 	}
 
 	public function remove_people_editor_support() {
