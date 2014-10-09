@@ -36,6 +36,7 @@ class WSU_Cereo_People {
 
 	public function remove_people_editor_support() {
 		remove_post_type_support( $this->person_content_type, 'editor' );
+		register_taxonomy_for_object_type( 'post_tag', $this->person_content_type );
 	}
 
 	public function add_meta_boxes( $post_type ) {
@@ -167,6 +168,14 @@ class WSU_Cereo_People {
 			}
 		}
 
+		$keywords = wp_get_object_terms( $post_id, 'post_tag' );
+
+		if ( ! is_wp_error( $keywords ) ) {
+			$keywords = wp_list_pluck( $keywords, 'name' );
+			$keywords = implode( ', ', $keywords );
+			$content_html .= '<tr><td>Keywords</td><td>' . $keywords . '</td></tr>';
+		}
+		
 		$content_html .= '</table>';
 
 		// Remove this action before saving the compile post content so that we aren't double processing the data.
