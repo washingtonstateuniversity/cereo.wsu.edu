@@ -143,27 +143,27 @@ class WSU_Cereo_People {
 		}
 
 		$fields = array(
-			'cereo_person_position',
-			'cereo_person_department',
-			'cereo_person_college',
-			'cereo_person_campus',
-			'cereo_person_address',
-			'cereo_person_phone',
-			'cereo_person_email',
-			'cereo_person_web',
-			'cereo_person_theme',
-			'cereo_person_specialty',
-			'cereo_person_courses',
-			'cereo_person_research',
-			'cereo_person_outreach',
+			'cereo_person_position' => 'Position',
+			'cereo_person_department' => 'Department',
+			'cereo_person_college' => 'College',
+			'cereo_person_campus' => 'Campus',
+			'cereo_person_address' => 'Address',
+			'cereo_person_phone' => 'Phone',
+			'cereo_person_email' => 'Email',
+			'cereo_person_web' => 'Web',
+			'cereo_person_theme' => 'CEREO Theme',
+			'cereo_person_specialty' => 'Specialty',
+			'cereo_person_courses' => 'Env Courses',
+			'cereo_person_research' => 'Env Research',
+			'cereo_person_outreach' => 'Env Outreach',
 		);
 
 		$content_html = '<table><tr><td>Name:</td><td>' . esc_html( $post->post_title ) . '</td></tr>';
 
-		foreach( $fields as $field ) {
+		foreach( $fields as $field => $name ) {
 			if ( isset( $_POST[ $field ] ) ) {
 				update_post_meta( $post_id, '_' . $field, sanitize_text_field( $_POST[ $field ] ) );
-				$content_html .= '<tr><td></td><td>' . sanitize_text_field( $_POST[ $field ] ) . '</td></tr>';
+				$content_html .= '<tr><td>' . $name . '</td><td>' . sanitize_text_field( $_POST[ $field ] ) . '</td></tr>';
 			}
 		}
 
