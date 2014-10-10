@@ -3,7 +3,7 @@
 get_header();
 
 ?>
-   <style>.person-last-name { font-size: 1rem; }</style>
+
 	<main class="spine-tax-index">
 
 		<?php get_template_part('parts/headers'); ?>
