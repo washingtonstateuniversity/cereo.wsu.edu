@@ -10,7 +10,7 @@ get_header();
 
 		<section class="row single gutter pad-ends">
 
-			<div class="column one">
+			<div class="column one" id="accordion">
 
 				<?php while ( have_posts() ) : the_post(); ?>
 

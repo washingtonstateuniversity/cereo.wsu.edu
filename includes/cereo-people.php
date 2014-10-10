@@ -82,6 +82,7 @@ class WSU_Cereo_People {
 	 * @todo - keywords
 	 */
 	public function display_people_fields_meta_box( $post ) {
+		$cereo_person_last_name = get_post_meta( $post->ID, 'cereo_person_last_name', true );
 		$cereo_person_position = get_post_meta( $post->ID, 'cereo_person_position', true );
 		$cereo_person_department = get_post_meta( $post->ID, 'cereo_person_department', true );
 		$cereo_person_college = get_post_meta( $post->ID, 'cereo_person_college', true );
@@ -109,6 +110,9 @@ class WSU_Cereo_People {
 				margin-bottom: 5px;
 			}
 		</style>
+		<label for="cereo-person-last-name">Last Name:</label>
+		<input class="regular-text" type="text" id="cereo-person-last-name" name="cereo_person_last_name" value="<?php echo esc_attr( $cereo_person_last_name ); ?>" />
+		<br />
 		<label for="cereo-person-position">Position:</label>
 		<input class="regular-text" type="text" id="cereo-person-position" name="cereo_person_position" value="<?php echo esc_attr( $cereo_person_position ); ?>" />
 		<br />
@@ -174,6 +178,7 @@ class WSU_Cereo_People {
 		}
 
 		$fields = array(
+			'cereo_person_last_name' => 0,
 			'cereo_person_position' => 'Position',
 			'cereo_person_department' => 'Department',
 			'cereo_person_college' => 'College',
@@ -194,7 +199,9 @@ class WSU_Cereo_People {
 		foreach( $fields as $field => $name ) {
 			if ( isset( $_POST[ $field ] ) ) {
 				update_post_meta( $post_id, $field, sanitize_text_field( $_POST[ $field ] ) );
-				$content_html .= '<tr><td>' . $name . '</td><td>' . sanitize_text_field( $_POST[ $field ] ) . '</td></tr>';
+				if ( 0 !== $name ) {
+					$content_html .= '<tr><td>' . $name . '</td><td>' . sanitize_text_field( $_POST[ $field ] ) . '</td></tr>';
+				}
 			}
 		}
 
