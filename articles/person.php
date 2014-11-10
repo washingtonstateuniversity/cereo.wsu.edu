@@ -9,6 +9,6 @@
 		<?php endif; ?>
 	</ul>
 </div>
-<div class="article-body">
+<div class="article-body" style="display: none;">
 	<?php the_content(); ?>
 </div>
